@@ -62,27 +62,6 @@ CREATE TABLE bookings (
   INDEX idx_booking_status (status)
 ) ENGINE=InnoDB;
 
-CREATE TABLE work_orders (
-  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  booking_id BIGINT UNSIGNED NULL,
-  customer_id BIGINT UNSIGNED NOT NULL,
-  vehicle_id BIGINT UNSIGNED NOT NULL,
-  mechanic_name VARCHAR(120) NULL,
-  odometer INT UNSIGNED NULL,
-  complaint TEXT NOT NULL,
-  diagnosis TEXT NULL,
-  labor_cost DECIMAL(14,2) NOT NULL DEFAULT 0,
-  parts_cost DECIMAL(14,2) NOT NULL DEFAULT 0,
-  status ENUM('Menunggu','Dikerjakan','Selesai','Dibatalkan') NOT NULL DEFAULT 'Menunggu',
-  started_at DATETIME NULL,
-  completed_at DATETIME NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_wo_booking FOREIGN KEY (booking_id) REFERENCES bookings(id) ON UPDATE CASCADE ON DELETE SET NULL,
-  CONSTRAINT fk_wo_customer FOREIGN KEY (customer_id) REFERENCES customers(id) ON UPDATE CASCADE ON DELETE RESTRICT,
-  CONSTRAINT fk_wo_vehicle FOREIGN KEY (vehicle_id) REFERENCES vehicles(id) ON UPDATE CASCADE ON DELETE RESTRICT,
-  INDEX idx_wo_status (status)
-) ENGINE=InnoDB;
-
 CREATE TABLE spare_parts (
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   sku VARCHAR(80) NOT NULL UNIQUE,
@@ -98,7 +77,6 @@ CREATE TABLE spare_parts (
 CREATE TABLE invoices (
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   invoice_number VARCHAR(60) NOT NULL UNIQUE,
-  work_order_id BIGINT UNSIGNED NOT NULL UNIQUE,
   customer_id BIGINT UNSIGNED NOT NULL,
   subtotal DECIMAL(14,2) NOT NULL DEFAULT 0,
   discount DECIMAL(14,2) NOT NULL DEFAULT 0,
@@ -109,7 +87,6 @@ CREATE TABLE invoices (
   due_date DATE NULL,
   issued_at DATE NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_invoice_work_order FOREIGN KEY (work_order_id) REFERENCES work_orders(id) ON UPDATE CASCADE ON DELETE RESTRICT,
   CONSTRAINT fk_invoice_customer FOREIGN KEY (customer_id) REFERENCES customers(id) ON UPDATE CASCADE ON DELETE RESTRICT,
   INDEX idx_invoice_status (status)
 ) ENGINE=InnoDB;
